@@ -21,7 +21,7 @@ html, body {
     left: 1%;
     width: 98%;
     height: 98%;
-    border: 2px solid #fff;
+    border: none;
 }
 
 #coffee-machine {
@@ -47,7 +47,7 @@ html, body {
     grid-template-rows: 1fr;
     gap: 2px;
     padding: 2px;
-    border-top: 2px solid #fff;
+    border-top: none;
     counter-reset: slot;
 }
 
@@ -58,7 +58,7 @@ html, body {
     width: calc((98% - 20px) / 9 * 3 + 4px);
     height: 39%;
     z-index: 1;
-    border: 2px solid yellow;
+    border: none;
     background: url('dialogue window hor.png') no-repeat center/100% 100%;
 }
 
@@ -79,9 +79,8 @@ html, body {
 #recipe-name {
     font-size: 36px;
     font-weight: bold;
-    color: yellow;
+    color: #fff;
     margin-bottom: 8px;
-    text-shadow: 0 0 10px rgba(255,255,0,0.5);
 }
 
 #recipe-desc {
@@ -91,7 +90,7 @@ html, body {
 }
 
 #recipe-desc span {
-    color: yellow;
+    color: #fff;
 }
 
 #submit-btn {
@@ -116,26 +115,21 @@ html, body {
     color: #000;
 }
 
-#reset-btn {
-    position: absolute;
-    bottom: 2%;
-    left: -4%;
-    width: 100px;
-    height: 40px;
-    background: none;
-    border: 2px solid #666;
-    color: #666;
-    font-family: 'Caveat', cursive;
-    font-size: 22px;
-    font-weight: bold;
-    cursor: pointer;
-    z-index: 3;
-    transition: all 0.2s;
-    letter-spacing: 1px;
-}
-#reset-btn:hover {
-    border-color: #fff;
+#day-counter {
+    position: fixed;
+    top: 3%;
+    right: calc(1% + 140px);
+    background: url('dialogue window hor.png') no-repeat center/100% 100%;
+    border: none;
     color: #fff;
+    font-family: 'Caveat', cursive;
+    font-size: 24px;
+    font-weight: bold;
+    padding: 5px 15px;
+    z-index: 10;
+    text-shadow: 0 0 5px rgba(0,0,0,0.5);
+    text-align: center;
+    pointer-events: none;
 }
 
 #result-msg {
@@ -143,11 +137,10 @@ html, body {
     margin-top: 8px;
     font-weight: bold;
     min-height: 24px;
+    color: #fff;
 }
 
 .ingredient-slot {
-    background: none;
-    border: 2px solid yellow;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -156,29 +149,9 @@ html, body {
     position: relative;
     overflow: visible;
     cursor: pointer;
-    transition: border-color 0.2s, background 0.2s;
 }
 
-.ingredient-slot:hover {
-    border-color: #fff;
-    background: rgba(255,255,255,0.08);
-}
 
-.ingredient-slot.selected {
-    border-color: #fff;
-    background: rgba(255,255,255,0.12);
-}
-
-.ingredient-slot::before {
-    content: counter(slot);
-    color: yellow;
-    font-size: 20px;
-    font-weight: bold;
-    position: absolute;
-    top: 2px;
-    left: 4px;
-    z-index: 2;
-}
 
 .ingredient-slot img {
     max-width: 90%;
@@ -199,7 +172,7 @@ html, body {
     transform: translateX(-50%);
     width: 48px;
     height: 48px;
-    border: 3px solid yellow;
+    border: none;
     color: #fff;
     font-size: 44px;
     font-weight: bold;
@@ -209,6 +182,31 @@ html, body {
     background: transparent;
     z-index: 5;
     margin-bottom: 6px;
+}
+
+.hor-box {
+    position: absolute;
+    top: 20%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 312px;
+    height: 86px;
+    border: none;
+    background: url('dialogue window hor.png') no-repeat center/100% 100%;
+    color: #fff;
+    font-size: 32px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 20;
+    transition: all 0.2s;
+    letter-spacing: 4px;
+    text-shadow: 0 0 5px rgba(0,0,0,0.5);
+}
+.hor-box:hover {
+    text-shadow: 0 0 10px rgba(255,255,255,0.5);
 }
 
 .ingredient-slot img {
@@ -258,6 +256,38 @@ html, body {
     text-shadow: 0 0 6px rgba(255,255,0,0.6);
     pointer-events: none;
 }
+#volume-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+    z-index: 10;
+    background: none;
+    border: 2px solid #666;
+    color: #666;
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    border-radius: 4px;
+    font-family: 'Caveat', cursive;
+}
+#volume-btn:hover { border-color: #fff; color: #fff; }
+#volume-slider {
+    position: fixed;
+    bottom: 68px;
+    right: 20px;
+    width: 120px;
+    height: 6px;
+    z-index: 10;
+    accent-color: yellow;
+    display: none;
+    cursor: pointer;
+}
+#volume-slider.show { display: block; }
 </style>
 </head>
 <body>
@@ -280,11 +310,15 @@ html, body {
             <div id="recipe-desc"></div>
             <div id="result-msg"></div>
         </div>
-        <button id="reset-btn">Сброс</button>
-        <button id="submit-btn">Сварить</button>
+        <button id="submit-btn" style="display:none">Сварить</button>
     </div>
+    <div class="hor-box" id="brew-btn">Сварить</div>
+    <div id="day-counter"></div>
+    <button id="volume-btn">♪</button>
+    <input type="range" id="volume-slider" min="0" max="100">
 </div>
 
+<script src="music.js"></script>
 <script>
 const INGREDIENT_NAMES = {
     1: 'Ванильный сироп', 2: 'Зёрна', 3: 'Какао',
@@ -338,7 +372,6 @@ function setRecipe(recipe) {
     }
     document.getElementById('recipe-desc').innerHTML = 'Хочет: <span>' + parts.join('</span>, <span>') + '</span>';
     document.getElementById('result-msg').textContent = '';
-    document.getElementById('result-msg').style.color = '#fff';
 }
 
 function resetSelection() {
@@ -373,18 +406,21 @@ function checkRecipe() {
     const pct = Math.max(0, Math.round(correct / total * 100));
     localStorage.setItem('catgirlResult', pct);
 
-    if (pct === 100) {
-        document.getElementById('result-msg').textContent = '✓ Идеально! Она счастлива!';
-        document.getElementById('result-msg').style.color = '#69db7c';
-    } else if (pct >= 50) {
-        document.getElementById('result-msg').textContent = '¯\\_(ツ)_/¯ Ну, пойдёт...';
-        document.getElementById('result-msg').style.color = '#ffd43b';
-    } else {
-        document.getElementById('result-msg').textContent = '✗ Она зла!';
-        document.getElementById('result-msg').style.color = '#ff6b6b';
+    // Увеличиваем счетчик дней при успешной варке
+    if (pct >= 50) {
+        let day = parseInt(localStorage.getItem('catgirlDay')) || 1;
+        localStorage.setItem('catgirlDay', day + 1);
     }
 
-    setTimeout(() => { location.href = 'game.html'; }, 1500);
+    if (pct === 100) {
+        document.getElementById('result-msg').textContent = '✓ Идеально! Она счастлива!';
+    } else if (pct >= 50) {
+        document.getElementById('result-msg').textContent = '¯\\_(ツ)_/¯ Ну, пойдёт...';
+    } else {
+        document.getElementById('result-msg').textContent = '✗ Она зла!';
+    }
+
+    setTimeout(() => { playAndGo('game.html'); }, 1500);
 }
 
 document.querySelectorAll('.ingredient-slot').forEach(slot => {
@@ -409,11 +445,22 @@ document.querySelectorAll('.ingredient-slot').forEach(slot => {
     });
 });
 
-document.getElementById('submit-btn').addEventListener('click', checkRecipe);
-document.getElementById('reset-btn').addEventListener('click', resetSelection);
+document.getElementById('brew-btn').addEventListener('click', checkRecipe);
 
 resetSelection();
 setRecipe(pickRecipe());
+
+function playAndGo(url) {
+    location.href = url;
+}
+
+// Счетчик дней
+const $dayCounter = document.getElementById('day-counter');
+if ($dayCounter) $dayCounter.textContent = 'День ' + (parseInt(localStorage.getItem('catgirlDay')) || 1);
+
+const volBtn = document.getElementById('volume-btn');
+const volSlider = document.getElementById('volume-slider');
+setVolumeUI(volSlider, volBtn);
 </script>
 </body>
 </html>

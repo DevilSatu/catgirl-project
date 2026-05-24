@@ -115,13 +115,55 @@ html, body {
     text-shadow: 0 0 20px rgba(255,255,255,0.5);
 }
 
+#day-counter {
+    position: fixed;
+    top: 3%;
+    right: calc(1% + 140px);
+    background: url('dialogue window hor.png') no-repeat center/100% 100%;
+    border: none;
+    color: #fff;
+    font-family: 'Caveat', cursive;
+    font-size: 24px;
+    font-weight: bold;
+    padding: 5px 15px;
+    z-index: 10;
+    text-shadow: 0 0 5px rgba(0,0,0,0.5);
+    text-align: center;
+    pointer-events: none;
+}
+
+.nextday-btn {
+    position: fixed;
+    bottom: 10%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 260px;
+    height: 70px;
+    border: none;
+    background: url('dialogue window hor.png') no-repeat center/100% 100%;
+    color: #fff;
+    font-size: 28px;
+    font-weight: bold;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 20;
+    transition: all 0.2s;
+    letter-spacing: 3px;
+    text-shadow: 0 0 5px rgba(0,0,0,0.5);
+}
+.nextday-btn:hover {
+    text-shadow: 0 0 10px rgba(255,255,255,0.5);
+}
+
 #volume-btn {
-    position: absolute;
-    bottom: 2%;
-    right: 2%;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
     width: 40px;
     height: 40px;
-    z-index: 5;
+    z-index: 10;
     background: none;
     border: 2px solid #666;
     color: #666;
@@ -132,40 +174,21 @@ html, body {
     justify-content: center;
     transition: all 0.2s;
     border-radius: 4px;
+    font-family: 'Caveat', cursive;
 }
-#volume-btn:hover {
-    border-color: #fff;
-    color: #fff;
-}
-
+#volume-btn:hover { border-color: #fff; color: #fff; }
 #volume-slider {
-    position: absolute;
-    bottom: calc(2% + 48px);
-    right: 2%;
+    position: fixed;
+    bottom: 68px;
+    right: 20px;
     width: 120px;
     height: 6px;
-    z-index: 5;
+    z-index: 10;
     accent-color: yellow;
     display: none;
     cursor: pointer;
 }
-#volume-slider.show {
-    display: block;
-}
-
-#volume-slider::-webkit-slider-runnable-track {
-    height: 6px;
-    background: #333;
-    border-radius: 3px;
-}
-#volume-slider::-webkit-slider-thumb {
-    width: 16px;
-    height: 16px;
-    background: yellow;
-    border-radius: 50%;
-    margin-top: -5px;
-    cursor: pointer;
-}
+#volume-slider.show { display: block; }
 </style>
 </head>
 <body>
@@ -178,10 +201,13 @@ html, body {
     <img id="catgirl" src="catgirl gif.gif" alt="catgirl">
 
     <div id="right-panel" onclick="location.href='cook.html'">Сварить</div>
+    <div id="day-counter"></div>
+    <div class="nextday-btn" id="nextday-btn">Следующий день</div>
     <button id="volume-btn">♪</button>
-    <input type="range" id="volume-slider" min="0" max="100" value="50">
+    <input type="range" id="volume-slider" min="0" max="100">
 </div>
 
+<script src="music.js"></script>
 <script>
 const REACTIONS = {
     happy: { img: 'happy catgirl.png', msgs: ['Ммм, вкуснятина! Спасибо!', 'Ты просто мастер!', 'Обожаю твой напиток!'] },
@@ -227,6 +253,7 @@ const introMsgs = [
     'Можно мне чего-нибудь тёпленького?',
     'Ммм, как хорошо, что ты здесь!',
     'Сделаешь мне любимый напиток?',
+    'Нажми на кофеварку справа, чтобы сварить мне кофе!',
 ];
 
 const allMsgs = state === 'neutral' ? introMsgs : reactionMsgs;
@@ -235,35 +262,29 @@ allMsgs.forEach((text, i) => {
     setTimeout(() => addMessage(text), i * 1500);
 });
 
-const audio = new Audio('https://stream-160.zeno.fm/0r0xa792kwzuv');
-audio.loop = true;
-audio.volume = 0.5;
+function playAndGo(url) {
+    location.href = url;
+}
+
+// Счетчик дней
+function getDay() {
+    return parseInt(localStorage.getItem('catgirlDay')) || 1;
+}
+const $dayCounter = document.getElementById('day-counter');
+if ($dayCounter) $dayCounter.textContent = 'День ' + getDay();
+
+// Показываем кнопку "Следующий день" только после результата варки
+const $nextdayBtn = document.getElementById('nextday-btn');
+if ($nextdayBtn && state !== 'neutral') {
+    $nextdayBtn.style.display = 'flex';
+    $nextdayBtn.addEventListener('click', () => {
+        location.href = 'game.html';
+    });
+}
 
 const volBtn = document.getElementById('volume-btn');
 const volSlider = document.getElementById('volume-slider');
-
-let audioStarted = false;
-
-function startAudio() {
-    if (audioStarted) return;
-    audio.play().catch(() => {});
-    audioStarted = true;
-}
-
-document.addEventListener('click', startAudio, { once: true });
-document.addEventListener('touchstart', startAudio, { once: true });
-
-volSlider.addEventListener('input', () => {
-    const v = volSlider.value / 100;
-    audio.volume = v;
-    volBtn.textContent = v === 0 ? '✕' : '♪';
-});
-
-volBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    startAudio();
-    volSlider.classList.toggle('show');
-});
+setVolumeUI(volSlider, volBtn);
 </script>
 </body>
 </html>
