@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Catgirl Tea Cafe — Cook</title>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body {
+    width: 100%;
+    height: 100%;
+    background: #000;
+    font-family: 'Caveat', cursive;
+    overflow: hidden;
+}
+
+#container {
+    position: absolute;
+    top: 1%;
+    left: 1%;
+    width: 98%;
+    height: 98%;
+    border: 2px solid #fff;
+}
+
+#coffee-machine {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+}
+
+#bottom-panel {
+    position: absolute;
+    bottom: 1%;
+    left: 1%;
+    width: 98%;
+    height: 25%;
+    background: none;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: repeat(9, 1fr);
+    grid-template-rows: 1fr;
+    gap: 2px;
+    padding: 2px;
+    border-top: 2px solid #fff;
+    counter-reset: slot;
+}
+
+#top-panel {
+    position: absolute;
+    top: 1%;
+    left: calc(1% + 2px);
+    width: calc((98% - 20px) / 9 * 3 + 4px);
+    height: 39%;
+    z-index: 1;
+    border: 2px solid yellow;
+    background: url('dialogue window hor.png') no-repeat center/100% 100%;
+}
+
+#recipe-display {
+    position: absolute;
+    top: 5%;
+    left: 5%;
+    width: 90%;
+    height: 90%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    z-index: 2;
+}
+
+#recipe-name {
+    font-size: 36px;
+    font-weight: bold;
+    color: yellow;
+    margin-bottom: 8px;
+    text-shadow: 0 0 10px rgba(255,255,0,0.5);
+}
+
+#recipe-desc {
+    font-size: 24px;
+    color: #fff;
+    line-height: 1.6;
+}
+
+#recipe-desc span {
+    color: yellow;
+}
+
+#submit-btn {
+    position: absolute;
+    bottom: 2%;
+    right: -4%;
+    width: 100px;
+    height: 40px;
+    background: none;
+    border: 2px solid yellow;
+    color: yellow;
+    font-family: 'Caveat', cursive;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 3;
+    transition: all 0.2s;
+    letter-spacing: 2px;
+}
+#submit-btn:hover {
+    background: yellow;
+    color: #000;
+}
+
+#reset-btn {
+    position: absolute;
+    bottom: 2%;
+    left: -4%;
+    width: 100px;
+    height: 40px;
+    background: none;
+    border: 2px solid #666;
+    color: #666;
+    font-family: 'Caveat', cursive;
+    font-size: 22px;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 3;
+    transition: all 0.2s;
+    letter-spacing: 1px;
+}
+#reset-btn:hover {
+    border-color: #fff;
+    color: #fff;
+}
+
+#result-msg {
+    font-size: 24px;
+    margin-top: 8px;
+    font-weight: bold;
+    min-height: 24px;
+}
+
+.ingredient-slot {
+    background: none;
+    border: 2px solid yellow;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    counter-increment: slot;
+    position: relative;
+    overflow: visible;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+}
+
+.ingredient-slot:hover {
+    border-color: #fff;
+    background: rgba(255,255,255,0.08);
+}
+
+.ingredient-slot.selected {
+    border-color: #fff;
+    background: rgba(255,255,255,0.12);
+}
+
+.ingredient-slot::before {
+    content: counter(slot);
+    color: yellow;
+    font-size: 20px;
+    font-weight: bold;
+    position: absolute;
+    top: 2px;
+    left: 4px;
+    z-index: 2;
+}
+
+.ingredient-slot img {
+    max-width: 90%;
+    max-height: 90%;
+    object-fit: contain;
+    transform: translateY(-50%);
+    transition: margin-top 0.2s ease;
+}
+
+.ingredient-slot:hover img {
+    margin-top: 12px;
+}
+
+.count-box {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 48px;
+    height: 48px;
+    border: 3px solid yellow;
+    color: #fff;
+    font-size: 44px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    z-index: 5;
+    margin-bottom: 6px;
+}
+
+.ingredient-slot img {
+    max-width: 90%;
+    max-height: 90%;
+    object-fit: contain;
+    transform: translateY(-50%);
+    transition: margin-top 0.2s ease;
+}
+
+.ingredient-slot:hover img {
+    margin-top: 12px;
+}
+
+.ingredient-slot:nth-child(2) img,
+.ingredient-slot:nth-child(3) img,
+.ingredient-slot:nth-child(5) img,
+.ingredient-slot:nth-child(6) img,
+.ingredient-slot:nth-child(7) img,
+.ingredient-slot:nth-child(8) img,
+.ingredient-slot:nth-child(9) img {
+    transform: translateY(-25%);
+}
+
+.ingredient-slot:nth-child(5) img,
+.ingredient-slot:nth-child(7) img {
+    transform: translateY(-20%);
+}
+
+.ingredient-slot:nth-child(4) img {
+    transform: translateY(-60%);
+}
+
+.ingredient-slot:nth-child(9) img {
+    transform: translate(4%, -28%);
+}
+
+.count-badge {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    color: yellow;
+    font-size: 20px;
+    font-weight: bold;
+    z-index: 3;
+    text-shadow: 0 0 6px rgba(255,255,0,0.6);
+    pointer-events: none;
+}
+</style>
+</head>
+<body>
+<div id="container">
+    <img id="coffee-machine" src="coffe.png" alt="coffee machine">
+    <div id="bottom-panel">
+        <div class="ingredient-slot" data-id="1"><img src="ingre/Ванильный сироп.png" alt="Ванильный сироп"><div class="count-box"></div></div>
+        <div class="ingredient-slot" data-id="2"><img src="ingre/зерна.png" alt="Зерна"><div class="count-box"></div></div>
+        <div class="ingredient-slot" data-id="3"><img src="ingre/Какао.png" alt="Какао"><div class="count-box"></div></div>
+        <div class="ingredient-slot" data-id="4"><img src="ingre/Карамельный сироп.png" alt="Карамельный сироп"><div class="count-box"></div></div>
+        <div class="ingredient-slot" data-id="5"><img src="ingre/Молоко.png" alt="Молоко"><div class="count-box"></div></div>
+        <div class="ingredient-slot" data-id="6"><img src="ingre/Мускатный орех.png" alt="Мускатный орех"><div class="count-box"></div></div>
+        <div class="ingredient-slot" data-id="7"><img src="ingre/Сахар.png" alt="Сахар"><div class="count-box"></div></div>
+        <div class="ingredient-slot" data-id="8"><img src="ingre/Соль.png" alt="Соль"><div class="count-box"></div></div>
+        <div class="ingredient-slot" data-id="9"><img src="ingre/Корица.png" alt="Корица"><div class="count-box"></div></div>
+    </div>
+    <div id="top-panel">
+        <div id="recipe-display">
+            <div id="recipe-name"></div>
+            <div id="recipe-desc"></div>
+            <div id="result-msg"></div>
+        </div>
+        <button id="reset-btn">Сброс</button>
+        <button id="submit-btn">Сварить</button>
+    </div>
+</div>
+
+<script>
+const INGREDIENT_NAMES = {
+    1: 'Ванильный сироп', 2: 'Зёрна', 3: 'Какао',
+    4: 'Карамельный сироп', 5: 'Молоко', 6: 'Мускатный орех',
+    7: 'Сахар', 8: 'Соль', 9: 'Корица'
+};
+
+const RECIPES = [
+    { name: 'Эспрессо', ings: {2: 2} },
+    { name: 'Двойной эспрессо', ings: {2: 3} },
+    { name: 'Американо', ings: {2: 2} },
+    { name: 'Капучино', ings: {2: 2, 5: 1} },
+    { name: 'Латте', ings: {2: 2, 5: 2} },
+    { name: 'Флэт уайт', ings: {2: 2, 5: 1} },
+    { name: 'Мокка', ings: {2: 2, 5: 1, 3: 1} },
+    { name: 'Горячий шоколад', ings: {3: 3, 5: 1, 7: 1} },
+    { name: 'Какао с корицей', ings: {3: 2, 5: 1, 9: 1} },
+    { name: 'Чай с корицей', ings: {9: 1, 7: 1} },
+    { name: 'Карамельный латте', ings: {2: 2, 5: 1, 4: 1} },
+    { name: 'Ванильный капучино', ings: {2: 2, 5: 1, 1: 1} },
+    { name: 'Пряный кофе', ings: {2: 2, 9: 1, 6: 1, 7: 1} },
+    { name: 'Солёная карамель', ings: {2: 2, 5: 1, 4: 1, 8: 1} },
+    { name: 'Мокка с корицей', ings: {2: 2, 5: 1, 3: 1, 9: 1} },
+    { name: 'Коктейль Бариста', ings: {2: 2, 5: 1, 3: 1, 4: 1, 1: 1} },
+    { name: 'Какао с пряностями', ings: {3: 2, 5: 1, 9: 1, 6: 1} },
+    { name: 'Мега кофе', ings: {2: 3, 5: 2, 7: 1, 9: 1} },
+    { name: 'Ванильный раф', ings: {2: 2, 5: 2, 1: 2} },
+    { name: 'Карамельный раф', ings: {2: 2, 5: 2, 4: 2} },
+    { name: 'Кофе по-королевски', ings: {2: 2, 7: 2, 5: 1, 9: 1} },
+    { name: 'Пряный чай', ings: {9: 1, 6: 1, 7: 1} },
+    { name: 'Солёный кофе', ings: {2: 2, 8: 1, 4: 1} },
+    { name: 'Шоколадный латте', ings: {2: 2, 5: 1, 3: 2} },
+    { name: 'Коричный капучино', ings: {2: 2, 5: 1, 9: 2} },
+    { name: 'Баунти', ings: {3: 2, 5: 2, 1: 1} },
+    { name: 'Сникерс', ings: {3: 2, 5: 1, 4: 1, 7: 1} },
+];
+
+let currentRecipe = null;
+let selected = {};
+
+function pickRecipe() {
+    return RECIPES[Math.floor(Math.random() * RECIPES.length)];
+}
+
+function setRecipe(recipe) {
+    currentRecipe = recipe;
+    document.getElementById('recipe-name').textContent = '☕ ' + recipe.name;
+    const parts = [];
+    for (const [id, qty] of Object.entries(recipe.ings)) {
+        parts.push(qty + '× ' + INGREDIENT_NAMES[id]);
+    }
+    document.getElementById('recipe-desc').innerHTML = 'Хочет: <span>' + parts.join('</span>, <span>') + '</span>';
+    document.getElementById('result-msg').textContent = '';
+    document.getElementById('result-msg').style.color = '#fff';
+}
+
+function resetSelection() {
+    selected = {};
+    document.querySelectorAll('.ingredient-slot').forEach(el => {
+        el.classList.remove('selected');
+        el.querySelector('.count-box').textContent = '';
+    });
+    document.getElementById('result-msg').textContent = '';
+}
+
+function updateBadge(slot) {
+    const id = slot.dataset.id;
+    const box = slot.querySelector('.count-box');
+    const count = selected[id] || 0;
+    box.textContent = count > 0 ? count : '';
+    slot.classList.toggle('selected', count > 0);
+}
+
+function checkRecipe() {
+    const target = currentRecipe.ings;
+    const total = Object.keys(target).length;
+    let correct = 0;
+
+    for (const [id, qty] of Object.entries(target)) {
+        if ((selected[id] || 0) === qty) correct++;
+    }
+    for (const [id] of Object.entries(selected)) {
+        if (!(id in target) && selected[id] > 0) correct--;
+    }
+
+    const pct = Math.max(0, Math.round(correct / total * 100));
+    localStorage.setItem('catgirlResult', pct);
+
+    if (pct === 100) {
+        document.getElementById('result-msg').textContent = '✓ Идеально! Она счастлива!';
+        document.getElementById('result-msg').style.color = '#69db7c';
+    } else if (pct >= 50) {
+        document.getElementById('result-msg').textContent = '¯\\_(ツ)_/¯ Ну, пойдёт...';
+        document.getElementById('result-msg').style.color = '#ffd43b';
+    } else {
+        document.getElementById('result-msg').textContent = '✗ Она зла!';
+        document.getElementById('result-msg').style.color = '#ff6b6b';
+    }
+
+    setTimeout(() => { location.href = 'game.html'; }, 1500);
+}
+
+document.querySelectorAll('.ingredient-slot').forEach(slot => {
+    slot.addEventListener('click', () => {
+        const id = slot.dataset.id;
+        if ((selected[id] || 0) >= 3) {
+            selected[id] = 0;
+        } else {
+            selected[id] = (selected[id] || 0) + 1;
+        }
+        updateBadge(slot);
+        document.getElementById('result-msg').textContent = '';
+    });
+    slot.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+        const id = slot.dataset.id;
+        if (selected[id] && selected[id] > 0) {
+            selected[id]--;
+            updateBadge(slot);
+        }
+        document.getElementById('result-msg').textContent = '';
+    });
+});
+
+document.getElementById('submit-btn').addEventListener('click', checkRecipe);
+document.getElementById('reset-btn').addEventListener('click', resetSelection);
+
+resetSelection();
+setRecipe(pickRecipe());
+</script>
+</body>
+</html>
